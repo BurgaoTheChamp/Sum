@@ -1,0 +1,8 @@
+1-First make a solution that works.
+    visualize the problem as a tree
+    implement the tree using recursion
+    test it
+2-Make it efficient.
+    add a hashmap 
+    add a base case to return hashmap values
+    store return values into the hashmap
