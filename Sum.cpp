@@ -25,6 +25,26 @@ bool canSum(const LL &targetSum, const std::vector<LL> &array){
     return false;
 }
 
+std::vector<LL> howSum(const LL &targetSum, const std::vector<LL> &array){
+    if (targetSum < 0)
+    {
+        return {-1};
+    }
+    for (int i = 0; i < array.size(); i++)
+    {
+        if (!(targetSum - array[i]))
+        {
+            return {array[i]};
+        }
+        std::vector<LL> result = howSum(targetSum - array[i], array);
+        if(result[0] != -1){
+            result.push_back(array[i]);
+            return result;
+        }         
+    }
+    return {-1}; 
+}
+
 bool canSum_hashed(const LL &targetSum, const std::vector<LL> &array){
 
     static std::unordered_map<LL, bool> container;
@@ -56,6 +76,34 @@ bool canSum_hashed(const LL &targetSum, const std::vector<LL> &array){
     return false;
 }
 
+std::vector<LL> howSum_hashed(const LL &targetSum, const std::vector<LL> &array){
+    static std::unordered_map<LL, std::vector<LL>> cache;
+
+    if (targetSum < 0)
+    {
+        return {-1};
+    }
+    if (cache.count(targetSum))
+    {
+        return cache[targetSum];
+    }
+    for (int i = 0; i < array.size(); i++)
+    {
+        if (!(targetSum - array[i]))
+        {
+            return {array[i]};
+        }
+        std::vector<LL> result = howSum_hashed(targetSum - array[i], array);
+        if(result[0] != -1){
+            result.push_back(array[i]);
+            cache[targetSum] = result;
+            return cache[targetSum];
+        }         
+    }
+    cache[targetSum] = {-1};
+    return {-1}; 
+}
+
 int main(){
 
     bool keep_going = true;
@@ -81,19 +129,54 @@ int main(){
         }
         
         auto start_hashed = std::chrono::steady_clock::now();
-        std::cout << "Case one: " << canSum_hashed(t, numbers) << std::endl;
+
+        std::cout << "Is it possible to sum (hashed): " << canSum_hashed(t, numbers) << std::endl;
 
         auto end_hashed = std::chrono::steady_clock::now();
 
         std::cout << "Elapsed time was: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_hashed - start_hashed).count() << " ms" << std::endl;
 
+        auto start_howsum_hashed = std::chrono::steady_clock::now();
+
+        std::cout << "The possible combination (hashed): \n";
+
+        auto result_hashed = howSum_hashed(t, numbers);
+
+        for (uint64_t i = 0; i < result_hashed.size(); i++)
+        {
+            std::cout << result_hashed[i] << " ";
+        }
+        
+        std::cout << "\n";
+
+        auto end_howsum_hashed = std::chrono::steady_clock::now();
+
+        std::cout << "Elapsed time was: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_howsum_hashed - start_howsum_hashed).count() << " ms" << std::endl;
+
         auto start = std::chrono::steady_clock::now();
 
-        std::cout << "Case two: " << canSum(t, numbers) << std::endl;
+        std::cout << "Is it possible to sum: " << canSum(t, numbers) << std::endl;
 
         auto end = std::chrono::steady_clock::now();
 
         std::cout << "Elapsed time was: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
+
+        auto start_howsum = std::chrono::steady_clock::now();
+
+        std::cout << "The possible combination: \n";
+
+        auto result = howSum(t, numbers);
+
+        for (uint64_t i = 0; i < result.size(); i++)
+        {
+            std::cout << result[i] << " ";
+        }
+        
+        std::cout << "\n";
+
+        auto end_howsum = std::chrono::steady_clock::now();
+
+        std::cout << "Elapsed time was: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_howsum - start_howsum).count() << " ms" << std::endl;
 
         std::cout << "Do you want to do another time test? (1 or 0) " << std::endl;
 
